@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Level Recipe Guide</title>
+  <style>
+    :root {
+      --primary-color: #5cb85c;
+      --primary-hover: #4cae4c;
+      --secondary-color: #6c757d;
+      --light-color: #f8f9fa;
+      --dark-color: #343a40;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fdfdfd;
+      color: #333;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+    
+    nav {
+      background: #fff;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    nav .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    nav .btn {
+      transition: transform 0.3s ease;
+      margin-left: 0.5rem;
+    }
+    
+    nav .btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .hero {
+      padding: 4rem 2rem;
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836') center/cover no-repeat;
+      color: #fff;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .container {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+    
+    .filters {
+      display: none; /* Changed to none by default */
+      visibility: visible !important;
+      opacity: 1 !important;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    #filterButtons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .recipes, .profile, .recipe-detail, .auth {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .recipe-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .recipe-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    .recipe-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    
+    .recipe-card-content {
+      padding: 1rem;
+    }
+    
+    .recipe-card h3 {
+      margin: 0 0 0.5rem 0;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+    
+    .badge-beginner {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .badge-intermediate {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .badge-advanced {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 5px;
+      background: var(--primary-color);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    input[type="text"], 
+    input[type="number"], 
+    input[type="email"], 
+    input[type="password"],
+    textarea {
+      display: block;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    
+    textarea {
+      min-height: 100px;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .trophy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .trophy-card {
+      text-align: center;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+    
+    .trophy-card img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background: #e9ecef;
+      border-radius: 5px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--primary-color);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .rating-stars {
+      color: #ffc107;
+      font-size: 1.5rem;
+      margin: 0.5rem 0;
+    }
+    
+    .review-card {
+      padding: 1rem;
+      margin: 1rem 0;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary-color);
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-card h3 {
+      margin-top: 0;
+      color: var(--secondary-color);
+    }
+    
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .recent-recipes {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">WeCook</div>
+    <div>
+      <button class="btn btn-outline" onclick="showSection('home')">Home</button>
+      <button class="btn btn-outline" onclick="showSection('profile')">Profile</button>
+      <button class="btn btn-outline" onclick="showSection('contact')">Contact Us</button>
+      <button class="btn" id="authButton" onclick="showSection('auth')">Login</button>
+    </div>
+  </nav>
+
+  <div class="hero" id="heroBanner">
+    <h1>Welcome to WeCook(the Multi-Level Recipe Guide)</h1>
+    <p>Explore and master recipes based on your cooking level.</p>
+    <p>Your journey to becoming a master chef starts here!</p>
+    <p>Exclusively taught by the master chef Lohithaksha Reddy!!</p>
+    <p>Premium plans start from $100/- for one on one sessions with the GOAT.</p>
+  </div>
+
+  <div class="container">
+    <!-- Home/Recipes Section -->
+    <div class="filters" style="background-color: #f9f9f9;">
+      <h2>Filter Recipes by Level</h2>
+      <div id="filterButtons" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem;">
+        <button class="btn" onclick="filterRecipes('all')">All</button>
+        <button class="btn badge-beginner" onclick="filterRecipes('beginner')">Beginner</button>
+        <button class="btn badge-intermediate" onclick="filterRecipes('intermediate')">Intermediate</button>
+        <button class="btn badge-advanced" onclick="filterRecipes('advanced')">Advanced</button>
+      </div>
+    </div>
+
+    <div class="recipes" id="home">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading recipes...</p>
+      </div>
+    </div>
+
+    <!-- Recipe Detail Section -->
+    <div class="recipe-detail hidden" id="recipeDetail">
+      <button onclick="showSection('home')" class="btn">← Back to Recipes</button>
+
+      <div id="recipeContent"></div>
+      
+      <h3>Reviews</h3>
+      <div id="reviews"></div>
+      
+      <div class="form-group">
+        <h4>Add Your Review</h4>
+        <textarea id="comment" placeholder="Share your thoughts about this recipe..."></textarea>
+        <div>
+          <label for="rating">Rating:</label>
+          <select id="rating">
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="1">★☆☆☆☆</option>
+          </select>
+        </div>
+        <button class="btn" onclick="submitReview()">Submit Review</button>
+      </div>
+      
+    </div>
+
+    <!-- Profile Section -->
+    <div class="profile hidden" id="profile">
+      <h2>My Cooking Profile</h2>
+      <div id="dashboardContent">
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <h3>Recipes Completed</h3>
+            <div class="value" id="dashboardCompleted">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Current Level</h3>
+            <div class="value" id="dashboardLevel">Beginner</div>
+          </div>
+          <div class="stat-card">
+            <h3>Experience Points</h3>
+            <div class="value" id="dashboardXP">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Trophies Earned</h3>
+            <div class="value" id="dashboardTrophies">0</div>
+          </div>
+        </div>
+        
+        <div class="recent-recipes">
+          <h3>Recently Completed Recipes</h3>
+          <div class="recipe-grid" id="recentRecipes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Us Section -->
+    <div class="auth hidden" id="contact">
+      <h2>Contact Us</h2>
+      <p><strong>Email:</strong> support@recipeguide.com</p>
+      <p><strong>Phone:</strong> +1-800-555-1234</p>
+      <p><strong>Address:</strong> 123 Culinary Lane, Food City, FC 56789</p>
+      <p>Feel free to reach out to us for any queries or feedback!</p>
+    </div>
+
+    <!-- Auth Section -->
+    <div class="auth hidden" id="auth">
+      <h2 id="authTitle">Login</h2>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter your username">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password">
+      </div>
+      <div id="extraFields" style="display: none;">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email">
+        </div>
+      </div>
+      <button class="btn" id="authActionButton" onclick="handleAuth()">Login</button>
+      <p>
+        <span id="toggleText">Don't have an account?</span>
+        <button class="btn btn-outline" onclick="toggleAuth()">Sign up</button>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Current user state
+    let currentUser = null;
+    let isSignup = false;
+    let currentRecipeId = null;
+    
+    // DOM Elements
+    const authButton = document.getElementById('authButton');
+    const authActionButton = document.getElementById('authActionButton');
+    const authTitle = document.getElementById('authTitle');
+    const toggleText = document.getElementById('toggleText');
+    const extraFields = document.getElementById('extraFields');
+    const heroBanner = document.getElementById('heroBanner');
+    const filtersSection = document.querySelector('.filters');
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuthState();
+      renderRecipes();
+    });
+    
+    // Check if user is logged in (will be replaced with actual auth check)
+    function checkAuthState() {
+      // In a real app, this would check localStorage or cookies for auth token
+      if (currentUser) {
+        authButton.textContent = 'Logout';
+        authButton.onclick = logout;
+      } else {
+        authButton.textContent = 'Login';
+        authButton.onclick = () => showSection('auth');
+      }
+    }
+    
+    function toggleAuth() {
+      isSignup = !isSignup;
+      authTitle.textContent = isSignup ? 'Sign Up' : 'Login';
+      authActionButton.textContent = isSignup ? 'Sign Up' : 'Login';
+      toggleText.textContent = isSignup ? 'Already have an account?' : "Don't have an account?";
+      toggleText.nextElementSibling.textContent = isSignup ? 'Login' : 'Sign up'; // Update button text
+      extraFields.style.display = isSignup ? 'block' : 'none';
+    }
+    
+  async function handleAuth() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  if (!username || !password) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  if (isSignup) {
+    return signUp();
+  }
+
+  try {
+    const response = await fetch('http://localhost:5000/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      currentUser = { id: data.user.user_id, username: data.user.username }; // Ensure this is correctly set
+      console.log('User logged in successfully:', currentUser); // Debugging
+      checkAuthState();
+      showSection('home');
+      alert('Login successful!');
+      clearAuthForm();
+    } else {
+      alert('Invalid credentials. Please try again.');
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    alert('An error occurred during login.');
+  }
+  console.log('Current user:', currentUser);
+
+}
+
+
+async function signUp() {
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  if (!username || !email || !password) {
+    alert('Please fill in all the fields.');
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:5000/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        email,
+        password
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert('Sign-up successful! Please log in.');
+      clearAuthForm();
+    } else {
+      alert(data.message || 'Sign-up failed. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error during sign-up:', error);
+    alert('An error occurred. Please try again later.');
+  }
+  console.log('Current user:', currentUser);
+
+}
+
+
+function logout() {
+  currentUser = null;
+  console.log('User logged out'); // Debugging
+  checkAuthState();
+  showSection('home');
+  alert('You have been logged out.');
+}
+
+    
+    function clearAuthForm() {
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('email').value = '';
+    }
+    
+    async function renderRecipes(level = 'all') {
+  try {
+    const response = await fetch(`http://localhost:5000/recipes?level=${level}`);
+    if (!response.ok) throw new Error('Network error');
+
+    const recipes = await response.json();
+    if (!Array.isArray(recipes)) throw new Error('Invalid data format');
+
+    console.log("Received recipes:", recipes);
+
+    const container = document.getElementById('home');
+
+    if (recipes.length === 0) {
+      container.innerHTML = `<p>No recipes found for this level.</p>`;
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="recipe-grid">
+        ${recipes.map(recipe => {
+          // Use recipe image if available, otherwise use a placeholder
+          const imageUrl = recipe.image_url || getRandomFoodImage(recipe.title);
+          return `
+            <div class="recipe-card">
+              <img src="${imageUrl}" alt="${recipe.title}">
+              <div class="recipe-card-content">
+                <h3>${recipe.title}</h3>
+                <span class="badge ${getBadgeClass(recipe.difficulty_level)}">${recipe.difficulty_level}</span>
+                <p>${recipe.description}</p>
+                <small>${recipe.preparation_time + recipe.cooking_time} min • ${recipe.servings} servings</small>
+                <br>
+                <button class="btn btn-outline" onclick="showRecipeDetail(${recipe.recipe_id})">
+                  View Recipe
+                </button>
+                <button class="btn" id="completeButton-${recipe.recipe_id}" onclick="completeRecipe(${recipe.recipe_id})">
+                  Mark as Complete
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } catch (error) {
+    console.error("Failed to load recipes:", error);
+    document.getElementById('home').innerHTML = `
+      <div class="error">
+        <p>Failed to load recipes. Please try again.</p>
+        <button onclick="renderRecipes()">Retry</button>
+      </div>
+    `;
+  }
+}
+
+
+    // Function to get a random food-related placeholder image
+    function getRandomFoodImage(title) {
+      const foodImages = [
+        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c',
+        'https://images.unsplash.com/photo-1512621776951-a57141f2eefd',
+        'https://images.unsplash.com/photo-1482049016688-2d3e1b311543',
+        'https://images.unsplash.com/photo-1484723091739-30a097e8f929',
+        'https://images.unsplash.com/photo-1490645935967-10de6ba17061',
+        'https://images.unsplash.com/photo-1506354666786-959d6d497f1a',
+        'https://images.unsplash.com/photo-1473093295043-cdd812d0e601',
+        'https://images.unsplash.com/photo-1467003909585-2f8a72700288'
+      ];
+      
+      // Use a deterministic image based on recipe title hash for consistency
+      let hash = 0;
+      for (let i = 0; i < title.length; i++) {
+        hash = title.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const index = Math.abs(hash) % foodImages.length;
+      return foodImages[index];
+    }
+
+    async function showRecipeDetail(recipeId) {
+  currentRecipeId = recipeId;
+  showSection('recipeDetail');
+  const recipeContent = document.getElementById('recipeContent');
+  recipeContent.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading recipe...</p></div>';
+
+  try {
+    const response = await fetch(`http://localhost:5000/recipe/${recipeId}`);
+    const recipe = await response.json();
+
+    if (!recipe) {
+      recipeContent.innerHTML = '<p>Recipe not found.</p>';
+      return;
+    }
+
+    // Use recipe image if available, otherwise use a placeholder
+    const imageUrl = recipe.image_url || getRandomFoodImage(recipe.title);
+
+    recipeContent.innerHTML = `
+      <div class="recipe-header">
+        <h2>${recipe.title}</h2>
+        <div>
+          <span class="badge ${getBadgeClass(recipe.difficulty_level)}">${recipe.difficulty_level}</span>
+          <span>${recipe.preparation_time + recipe.cooking_time} min • ${recipe.servings} servings</span>
+        </div>
+      </div>
+      <div class="recipe-image">
+        <img src="${imageUrl}" alt="${recipe.title}" style="width:100%; max-height:400px; object-fit:cover; border-radius:8px;">
+      </div>
+      <div class="recipe-description">
+        <p>${recipe.description}</p>
+      </div>
+      <div class="recipe-details">
+        <div class="ingredients">
+          <h3>Ingredients</h3>
+          <ul>${recipe.ingredients.split('\n').map(i => `<li>${i}</li>`).join('')}</ul>
+        </div>
+        <div class="instructions">
+          <h3>Instructions</h3>
+          <ol>${recipe.instructions.split('\n').map(step => `<li>${step}</li>`).join('')}</ol>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    console.error('Error loading recipe:', err);
+    recipeContent.innerHTML = '<p>Error loading recipe details.</p>';
+  }
+}
+
+
+async function submitReview() {
+      if (!currentUser) {
+        alert('Please login to submit a review.');
+        showSection('auth');
+        return;
+      }
+
+      const comment = document.getElementById('comment').value.trim();
+      const rating = document.getElementById('rating').value;
+
+      if (!comment) {
+        alert('Please enter a review comment.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/recipe/${currentRecipeId}/review`,
+    {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: currentUser.id,
+            rating: parseInt(rating),
+            comment
+          })
+        });
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        if (data.success) {
+          alert('Review submitted successfully!');
+          document.getElementById('comment').value = '';
+          document.getElementById('rating').value = '5';
+          showRecipeDetail(currentRecipeId); // Refresh to show new review
+        } else {
+          alert('Failed to submit review. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error submitting review:', error);
+        alert('An error occurred while submitting your review.');
+      }
+      console.log("Submitting review:", {
+    user_id: currentUser.id,
+    rating: parseInt(rating),
+    comment
+      } );
+
+}
+
+    function getBadgeClass(level) {
+      switch (level.toLowerCase()) {
+        case 'beginner': return 'badge-beginner';
+        case 'intermediate': return 'badge-intermediate';
+        case 'advanced': return 'badge-advanced';
+        default: return '';
+      }
+    }
+
+    async function completeRecipe(recipeId) {
+  if (!currentUser) {
+    alert('Please login to track your progress.');
+    showSection('auth');
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/recipe/${recipeId}/complete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser.id })
+    });
+
+    if (!response.ok) {
+      console.error('Failed response:', await response.text());
+      throw new Error('Server returned an error');
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert('Recipe marked as complete! Your progress has been saved.');
+      const completeButton = document.getElementById(`completeButton-${recipeId}`);
+      if (completeButton) {
+        completeButton.textContent = '✓ Already Completed';
+        completeButton.disabled = true;
+        completeButton.style.backgroundColor = '#6c757d';
+      }
+      updateUserProfile(); // Update the profile after marking completion
+    } else {
+      alert('Failed to mark recipe as complete. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error completing recipe:', error);
+    alert('An error occurred while saving your progress. Check the console for details.');
+  }
+}
+
+
+
+
+async function updateUserProfile() {
+  if (!currentUser) return;
+
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/user/${currentUser.id}/profile`);
+    const data = await response.json();
+
+    if (!data) throw new Error('Profile data is missing.');
+
+    // Update the profile only if the elements exist
+    const levelElement = document.getElementById('dashboardLevel');
+    if (levelElement) {
+      levelElement.textContent = data.cooking_level || 'Beginner';
+      levelElement.className = `badge ${getBadgeClass(data.cooking_level)}`;
+    }
+
+    const completedCountElement = document.getElementById('completedCount');
+    if (completedCountElement) {
+      completedCountElement.textContent = data.completed_recipes || 0;
+    }
+
+    const progressFillElement = document.getElementById('progressFill');
+    if (progressFillElement) {
+      const progressPercent = Math.min(100, (data.completed_recipes / data.total_recipes) * 100);
+      progressFillElement.style.width = `${progressPercent}%`;
+    }
+  } catch (error) {
+    console.error('Error updating profile:', error);
+  }
+}
+
+
+    
+    function showSection(sectionId) {
+      if (!currentUser && sectionId !== 'home' && sectionId !== 'auth') {
+        alert('Please login to access this section.');
+        showSection('auth');
+        return;
+      }
+      
+      // Hide all sections
+      document.querySelectorAll('.recipes, .recipe-detail, .profile, .auth')
+        .forEach(el => el.classList.add('hidden'));
+      
+      // Show the requested section
+      document.getElementById(sectionId)?.classList.remove('hidden');
+      
+      // Show/hide hero banner and filters based on section
+      if (sectionId === 'home') {
+        heroBanner.style.display = 'block';
+        filtersSection.style.display = 'block';
+      } else {
+        heroBanner.style.display = 'none';
+        filtersSection.style.display = 'none';
+      }
+      
+      // Update section data if needed
+      if (sectionId === 'profile' && currentUser) {
+        updateUserProfile();
+      }
+    }
+    
+    function filterRecipes(level) {
+      renderRecipes(level);
+    }
+  </script>
+</body>
+</html>
+``` 
